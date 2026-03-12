@@ -1,0 +1,32 @@
+
+output_dir: data
+user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36"
+respect_robots: true
+partners:
+  - name: BMS
+    url: https://www.bms.com/researchers-and-partners/in-the-pipeline.html
+  - name: JnJ
+    url: https://www.investor.jnj.com/pipeline/development-pipeline/default.aspx
+    render_js: true
+    headers:
+      User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+      Accept-Language: "en-US,en;q=0.9"
+      Referer: "https://www.investor.jnj.com/overview/default.aspx"
+      Upgrade-Insecure-Requests: "1"
+  - name: Roche
+    url: https://www.roche.com/solutions/pipeline
+    csv_via_click: true
+  - name: Takeda
+    # Discovery page containing the “Download the PDF” button
+    url: https://www.takeda.com/science/pipeline/
+    pdf_discovery: true
+    discovery_page: https://www.takeda.com/science/pipeline/
+    # keep only the latest pdf; overwrite previous
+    pdf_dir: "data/pdfs"
+    pdf_filename: "takeda_latest.pdf"
+          
+    refresh_pdf: false   # turn true to force a fresh download
+  - name: ArgenX
+    url: https://argenx.com/pipeline
+    render_js: true

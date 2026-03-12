@@ -1,0 +1,12 @@
+
+beautifulsoup4>=4.12
+lxml>=5.1
+requests
+pandas>=2.2
+pydantic>=2.6
+tenacity>=8.2
+PyYAML>=6.0
+tqdm>=4.66
+pdfplumber
+camelot-py[cv]
+playwright
