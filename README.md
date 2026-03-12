@@ -19,26 +19,42 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 
 # Dry run using the example config (update URLs first)
-python -m pipeline_scraper   --config examples/config.yaml   --out data/pipeline_YYYYMMDD.csv   --format csv   --partners BMS JnJ Roche Takeda ArgenX
+python -m pipeline_scraper   --config examples/config.yaml  --format jsonl   --partners BMS JnJ Roche Takeda ArgenX
 ```
 
 ## Config file (YAML)
 ```yaml
-# examples/config.yaml
 output_dir: data
-user_agent: "PharmaPipelineScraper/1.0 (+contact@example.com)"
+user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36"
 respect_robots: true
 partners:
   - name: BMS
     url: https://www.bms.com/researchers-and-partners/in-the-pipeline.html
   - name: JnJ
     url: https://www.investor.jnj.com/pipeline/development-pipeline/default.aspx
+    render_js: true
+    headers:
+      User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+      Accept-Language: "en-US,en;q=0.9"
+      Referer: "https://www.investor.jnj.com/overview/default.aspx"
+      Upgrade-Insecure-Requests: "1"
   - name: Roche
     url: https://www.roche.com/solutions/pipeline
+    csv_via_click: true
   - name: Takeda
-    url: https://www.takedaoncology.com/science/pipeline/?utm_source=aw_sbr_paidsearch&utm_medium=cpc&utm_campaign=takonpi_corp_sem_crs_aw_sbr_nat_awa_phrs&utm_keyword=takeda-oncology-pipeline&utm_id=takonpi23362&gclsrc=aw.ds&gad_source=1&gad_campaignid=20787203671&gbraid=0AAAAAqTCZsBLrW29wNSt1kvH0gESOn95S&gclid=EAIaIQobChMI98-ZrJuWkwMVRCdECB2LMC-SEAAYASAAEgJ_AvD_BwE
+    # Discovery page containing the “Download the PDF” button
+    url: https://www.takeda.com/science/pipeline/
+    pdf_discovery: true
+    discovery_page: https://www.takeda.com/science/pipeline/
+    # keep only the latest pdf; overwrite previous
+    pdf_dir: "data/pdfs"
+    pdf_filename: "takeda_latest.pdf"
+          
+    refresh_pdf: false   # turn true to force a fresh download
   - name: ArgenX
     url: https://argenx.com/pipeline
+    render_js: true
 ```
 
 ## Output schema
@@ -47,6 +63,7 @@ Each record contains at least:
 - `company` (str)
 - `drug_name` (str)
 - `phase` (normalized; e.g., `Phase 1`, `Phase 2/3`, `Filed`, `Approved`, `Preclinical`, `Discovery`)
+- `indication` (str)
 - `source_url` (str)
 - `scraped_at` (UTC ISO timestamp)
 
@@ -60,6 +77,3 @@ Optional best-effort fields (if easily available): `indication`, `therapy_area`,
 ## Notes
 - Some pages may load dynamically. This project uses `requests + BeautifulSoup`. If JavaScript rendering is required, we can add a Playwright/Selenium fallback later.
 - Parsing rules evolve; keep parsers small, tested, and company-specific.
-
-## License
-MIT
