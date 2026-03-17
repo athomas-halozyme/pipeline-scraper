@@ -23,9 +23,8 @@ partners:
     discovery_page: https://www.takeda.com/science/pipeline/
     # keep only the latest pdf; overwrite previous
     pdf_dir: "data/pdfs"
-    pdf_filename: "takeda_latest.pdf"
-          
-    refresh_pdf: false   # turn true to force a fresh download
+    pdf_filename: "takeda_latest.pdf"    
+    refresh_pdf: true   # turn false to use locally stored pdf
   - name: ArgenX
     url: https://argenx.com/pipeline
     render_js: true
