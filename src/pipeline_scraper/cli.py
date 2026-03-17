@@ -9,7 +9,6 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from tqdm import tqdm
 
-
 from .config import AppConfig
 from .http import fetch_html, fetch_html_with_session, fetch_html_rendered, FetchError
 from .registry import get_parser
@@ -20,24 +19,20 @@ from .discovery.takeda import discover_pipeline_pdf
 
 def write_output(records: List[dict], path: Path, fmt: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-
     # Normalize + reorder columns globally
     records = shape_records_for_output(records)
-
     if fmt == 'csv':
         df = pd.DataFrame(records)
         cols = list(records[0].keys()) if records else []
         if cols:
             df = df[cols]
         df.to_csv(path, index=False)
-
     elif fmt in {'jsonl', 'ndjson'}:
         with open(path, 'w', encoding='utf-8') as f:
             for r in records:
                 f.write(json.dumps(r, ensure_ascii=False) + '\n')
     else:
         raise ValueError(f"Unsupported format: {fmt}")
-
 
 
 def main():
@@ -50,6 +45,7 @@ def main():
     args = parser.parse_args()
 
     cfg = AppConfig.load(args.config)
+
     selected = set(p.name for p in cfg.partners)
     if args.partners:
         requested = set(args.partners)
@@ -57,7 +53,7 @@ def main():
         if unknown:
             raise SystemExit(f"Unknown partners in --partners: {sorted(unknown)}")
         selected = requested
-    
+
     all_records: List[dict] = []
     now = utc_now_iso()
 
@@ -67,7 +63,6 @@ def main():
 
     partners_to_run = [p for p in cfg.partners if p.name in selected]
     pbar = tqdm(partners_to_run, desc="Scraping partners", unit="partner")
-    
 
     for p in pbar:
         if p.name not in selected:
@@ -101,7 +96,6 @@ def main():
                 )
                 if r.status_code >= 400:
                     raise FetchError(f"HTTP {r.status_code} for {pdf_url}")
-
                 content = r.content
                 if not content.lstrip().startswith(b"%PDF-"):
                     raise FetchError("Takeda: expected PDF bytes but got non-PDF")
@@ -153,13 +147,10 @@ def main():
                     extra_headers=(p.headers or None)
                 )
                 source_url = str(p.url)
-
         except FetchError as e:
             print(f"[WARN] Failed to fetch {p.name}: {e}")
             continue
 
-
-        
         if p.name == "Takeda" and isinstance(payload, str):
             pdf_url = discover_pipeline_pdf(getattr(p, "discovery_page", None) or str(getattr(p, "url", "")), cfg.user_agent)
             source_url = pdf_url
@@ -178,11 +169,9 @@ def main():
                 raise FetchError("Takeda: expected PDF bytes but got non-PDF")
             payload = content  # ensure bytes for the parser
 
-
         # Parse
         parser_impl = get_parser(p.name)
         records = parser_impl.parse(payload, source_url or getattr(p, "url", ""))
-
 
         # Stamp times + normalize schema for output
         for r in records:
@@ -191,8 +180,7 @@ def main():
             rec = r.to_dict()
             # Ensure required keys exist for uniform JSONL schema
             rec.setdefault("source_url", source_url or getattr(p, "url", ""))
-            rec.setdefault("mechanism", None)
-            rec.setdefault("raw", None)
+            # (mechanism/raw are dropped by write_output shaping; no need to add here)
             all_records.append(rec)
 
         print(f"[INFO] {p.name}: extracted {len(records)} records")
@@ -218,20 +206,14 @@ def main():
     else:
         out_dir = Path(cfg.output_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
-
         # Convert UTC ISO string → aware UTC datetime
         utc_dt = datetime.fromisoformat(now.replace('Z', '+00:00'))
-
         # Convert UTC → California time
         local_dt = utc_dt.astimezone(ZoneInfo("America/Los_Angeles"))
-
         # Build readable timestamp
         stamp = local_dt.strftime('%Y-%m-%d_%H%M_%Z')
-
         ext = "csv" if args.format == "csv" else "jsonl"
         out_path = out_dir / f"pipeline_{stamp}.{ext}"
-
-
 
     write_output(all_records, out_path, args.format)
     print(f"[OK] Wrote {len(all_records)} records to {out_path}")
