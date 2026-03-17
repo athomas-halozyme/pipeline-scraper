@@ -100,11 +100,32 @@ def main():
                 if not content.lstrip().startswith(b"%PDF-"):
                     raise FetchError("Takeda: expected PDF bytes but got non-PDF")
 
-                # Keep only the latest PDF (overwrite)
+                
+                # Keep only the latest PDF (dated filename + remove previous one)
                 pdf_dir = Path(getattr(p, "pdf_dir", Path(cfg.output_dir) / "pdfs"))
                 pdf_dir.mkdir(parents=True, exist_ok=True)
-                pdf_path = pdf_dir / (getattr(p, "pdf_filename", "takeda_latest.pdf"))
+
+                # Build a local California date stamp from `now`
+                utc_dt = datetime.fromisoformat(now.replace('Z', '+00:00'))
+                local_dt = utc_dt.astimezone(ZoneInfo("America/Los_Angeles"))
+                stamp_date = local_dt.strftime('%Y-%m-%d')  # e.g., 2026-03-10
+
+                # Base name and suffix come from configured filename (default: takeda_latest.pdf)
+                base_name = getattr(p, "pdf_filename", "takeda_latest.pdf")
+                stem = Path(base_name).stem       # -> "takeda_latest"
+                suffix = Path(base_name).suffix   # -> ".pdf"
+
+                # Remove previous dated file(s) that match the naming pattern
+                for old in pdf_dir.glob(f"{stem}_*.pdf"):
+                    try:
+                        old.unlink()
+                    except Exception:
+                        pass  # ignore any race/lock issues during cleanup
+
+                # Write the new dated file
+                pdf_path = pdf_dir / f"{stem}_{stamp_date}{suffix}"
                 pdf_path.write_bytes(content)
+
 
                 # Optional debug copy
                 if debug_dir:
