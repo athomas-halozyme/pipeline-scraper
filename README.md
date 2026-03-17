@@ -70,12 +70,12 @@ Each record contains:
 ## Scraping methods
 - Static HTML: If the table is in the browser and in the page source (`requests + BeautifulSoup`)
 - Rendered HTML: If the table is in the browser but is not within the page source (needs rendering: `Playwright`)
-  Config: `render_js: true`
+  - Config: `render_js: true`
 - CSV ingestion: If the partner publishes data files for download (`pandas`)
-  Config: - `csv_url: https://…/file.csv` (if direct URL to CSV)
-          - `csv_via_click: true` (if simulate a download click on the page needed)
+  - Config: - `csv_url: https://…/file.csv` (if direct URL to CSV)
+            - `csv_via_click: true` (if simulate a download click on the page needed)
 - PDF ingestion: If the partner only shares PDFs, use the PDF discovery + extraction route (`pdfplumber`, `camelot`)
-  Config: - `pdf_discovery: true`
+  - Config: - `pdf_discovery: true`
 
 ## Parser architecture
 - `BaseParser` defines the interface and helpers
