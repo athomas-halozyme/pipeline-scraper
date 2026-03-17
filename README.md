@@ -63,7 +63,7 @@ Each record contains:
 - `drug_name` (str)
 - `phase` (str)
 - `indication` (str)
-- `therapeutic area` (str)
+- `therapeutic_area` (str)
 - `source_url` (str)
 - `scraped_at` (UTC ISO timestamp)
 
@@ -75,4 +75,4 @@ Each record contains:
 
 ## Notes
 - Some pages may load dynamically. This project uses `requests + BeautifulSoup`. If JavaScript rendering is required, we then add a Playwright agent to mimick user navigation and trigger rendering.
-- Parsing rules evolve; keep parsers small, tested, and company-specific.
+- Parsing rules evolve; keep parsers updated, tested, and company-specific.
