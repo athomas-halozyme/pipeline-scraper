@@ -2,7 +2,7 @@
 
 A lightweight, extensible Python CLI to scrape publicly available **drug/compound names** and **development phases** from partner pipeline pages (e.g., BMS, J&J, Roche, Takeda, argenx).
 
-> ⚠️ **Use responsibly**: Always follow each site's Terms of Use and robots.txt. This tool is for compliant, internal research only.
+> **Use responsibly**: Always follow each site's Terms of Use and robots.txt. This tool is for compliant, internal research only.
 
 ## Features
 - Config-driven list of partners and URLs (YAML)
@@ -74,5 +74,5 @@ Optional best-effort fields (if easily available): `indication`, `therapy_area`,
 - A generic table parser is provided as a fallback
 
 ## Notes
-- Some pages may load dynamically. This project uses `requests + BeautifulSoup`. If JavaScript rendering is required, we can add a Playwright/Selenium fallback later.
+- Some pages may load dynamically. This project uses `requests + BeautifulSoup`. If JavaScript rendering is required, we then add a Playwright agent to mimick user navigation and trigger rendering.
 - Parsing rules evolve; keep parsers small, tested, and company-specific.
