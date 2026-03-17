@@ -67,6 +67,11 @@ Each record contains:
 - `source_url` (str)
 - `scraped_at` (UTC ISO timestamp)
 
+## Scraping methods used
+- Static HTML: If the table is in the browser and in the page source
+- Rendered HTML: If the table is in the browser but is not within the page source (needs rendering)
+- CSV ingestion: If the partner publishes data files for download.
+- PDF ingestion: If the partner only shares PDFs, use the PDF discovery + extraction route.
 
 ## Parser architecture
 - `BaseParser` defines the interface and helpers
