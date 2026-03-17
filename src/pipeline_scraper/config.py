@@ -22,7 +22,7 @@ class Partner(BaseModel):
 
 class AppConfig(BaseModel):
     output_dir: str = 'data'
-    user_agent: str = 'PharmaPipelineScraper/1.0 (+contact@example.com)'
+    user_agent: str = 'HalozymePipelineScraper (athomas@halozyme.com)'
     respect_robots: bool = True
     partners: List[Partner]
 

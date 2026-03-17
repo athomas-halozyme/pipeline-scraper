@@ -16,6 +16,7 @@ A lightweight, extensible Python CLI to scrape publicly available **drug/compoun
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
+python -m pip install -e .
 
 # Dry run pulling all partners from config
 python -m pipeline_scraper   --config examples/config.yaml  --format jsonl
@@ -49,7 +50,6 @@ partners:
     # keep only the latest pdf; overwrite previous
     pdf_dir: "data/pdfs"
     pdf_filename: "takeda_latest.pdf"
-          
     refresh_pdf: false   # turn true to force a fresh download
   - name: ArgenX
     url: https://argenx.com/pipeline
@@ -57,16 +57,16 @@ partners:
 ```
 
 ## Output schema
-Each record contains at least:
+Each record contains:
 
 - `company` (str)
 - `drug_name` (str)
-- `phase` (normalized; e.g., `Phase 1`, `Phase 2/3`, `Filed`, `Approved`, `Preclinical`, `Discovery`)
+- `phase` (str)
 - `indication` (str)
+- `therapeutic area` (str)
 - `source_url` (str)
 - `scraped_at` (UTC ISO timestamp)
 
-Optional best-effort fields (if easily available): `indication`, `therapy_area`, `mechanism`, `raw` (dict of source columns).
 
 ## Parser architecture
 - `BaseParser` defines the interface and helpers

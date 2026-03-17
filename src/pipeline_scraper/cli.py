@@ -2,12 +2,12 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 from typing import List
-import csv
 import json
 import pandas as pd
 import requests
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from tqdm import tqdm
 
 
 from .config import AppConfig
@@ -57,7 +57,7 @@ def main():
         if unknown:
             raise SystemExit(f"Unknown partners in --partners: {sorted(unknown)}")
         selected = requested
-
+    
     all_records: List[dict] = []
     now = utc_now_iso()
 
@@ -65,11 +65,14 @@ def main():
     if debug_dir:
         debug_dir.mkdir(parents=True, exist_ok=True)
 
-    for p in cfg.partners:
+    partners_to_run = [p for p in cfg.partners if p.name in selected]
+    pbar = tqdm(partners_to_run, desc="Scraping partners", unit="partner")
+    
+
+    for p in pbar:
         if p.name not in selected:
             continue
 
-        # ensure these exist for every partner path
         payload = None
         source_url = None
 
