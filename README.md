@@ -7,7 +7,6 @@ A lightweight, extensible Python CLI to scrape publicly available **drug/compoun
 ## Features
 - Config-driven list of partners and URLs (YAML)
 - Company-specific parsers with a common data schema
-- Retry with backoff, polite defaults (UA string, optional robots check)
 - Output to CSV or JSON Lines
 
 ## Quickstart
